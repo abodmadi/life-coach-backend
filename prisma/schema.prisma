@@ -1,0 +1,217 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String  @id @default(uuid())
+  firstName String
+  lastName  String
+  email     String  @unique
+  phone     String  @unique
+  password  String
+  image     String?
+  role      Role    @default(STUDENT)
+
+  adminCources       Course[]     @relation("adminCourses")
+  adminAssignments   Assignment[] @relation("adminAssignments")
+  studentAssignments Assignment[] @relation("studentAssignments")
+
+  tokens      Token[]
+  payments    Payment[]
+  gaols       Gaol[]
+  enrollments Enrollment[]
+  progress    Progress[]
+  submissions Submission[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Gaol {
+  id          String @id @default(uuid())
+  title       String
+  description String @db.MediumText
+  status      String @default("created")
+
+  studentId String
+  student   User   @relation(fields: [studentId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("gaols")
+}
+
+model Enrollment {
+  id             String   @id @default(uuid())
+  enrollmentDate DateTime 
+
+  studentId String
+  courseId  String
+
+  student User   @relation(fields: [studentId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  course  Course @relation(fields: [courseId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("enrollments")
+}
+
+model Course {
+  id          String @id @default(uuid())
+  name        String
+  description String @db.MediumText
+  coverImage  String
+  price       Float
+
+  adminId String
+  admin   User   @relation("adminCourses", fields: [adminId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  chapters    Chapter[]
+  enrollments Enrollment[]
+  payments Payment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("courses")
+}
+
+model Progress {
+  id           String         @id @default(uuid())
+  status       ProgressStatus @default(NOT_STARTED)
+  lastAccessed DateTime       @default(now())
+
+  studentId String
+  chapterId String
+  student   User    @relation(fields: [studentId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  chapter   Chapter @relation(fields: [chapterId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("progress")
+}
+
+model Chapter {
+  id          String @id @default(uuid())
+  name        String
+  description String @db.MediumText
+  coverImage  String
+  videoUrl    String
+
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  assignments Assignment[]
+  progress    Progress[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("chapters")
+}
+
+model Submission {
+  id          String   @id @default(uuid())
+  submitted   Boolean  @default(false)
+  submittedAt DateTime @default(now())
+
+  studentId    String
+  assignmentId String
+
+  student    User       @relation(fields: [studentId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  assignment Assignment @relation(fields: [assignmentId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Assignment {
+  id          String  @id @default(uuid())
+  title       String
+  description String  @db.MediumText
+  attachments String?
+  status      String  @default("hidden")
+
+  startDate DateTime 
+  endDate   DateTime 
+
+  adminId   String
+  studentId String
+  chapterId String
+
+  admin   User    @relation("adminAssignments", fields: [adminId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  student User    @relation("studentAssignments", fields: [studentId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  chapter Chapter @relation(fields: [chapterId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  Submissions Submission[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("assignments")
+}
+
+model Payment {
+  id             String        @id @default(uuid())
+  paymentReceipt String
+  paymentDate    DateTime      
+  status         PaymentStatus @default(Requested)
+
+  studentId String
+  courseId String
+  student   User   @relation(fields: [studentId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  course   Course   @relation(fields: [courseId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("payments")
+}
+
+model Token {
+  id    String @id @default(uuid())
+  token String @db.MediumText
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("tokens")
+}
+
+// Enums
+enum Role {
+  ADMIN
+  STUDENT
+}
+
+enum ProgressStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum PaymentStatus {
+  Requested
+  Pending
+  Accepted
+  Rejected
+}
