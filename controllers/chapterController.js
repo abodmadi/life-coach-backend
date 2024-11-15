@@ -1,30 +1,36 @@
 import prismaClient from "../utils/prismaClient.js";
 
 export const index = async (request, response) => {
-  try {
-    const courses = await prismaClient.course.findMany({
-      include: {
-        _count: {
+  const chapters = await prismaClient.chapter.findMany({
+    include: {
+      /* _count: {
           select: {
             chapters: true,
           },
-        },
-        admin: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
+        }, */
+      course: {
+        select: {
+          id: true,
+          name: true,
+          admin: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+            },
           },
         },
       },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
 
-    return response.status(200).json({
-      courses: courses,
-    });
+  return response.status(200).json({
+    chapters: chapters,
+  });
+  try {
   } catch (error) {
     return response.status(406).json({
       error: error,
@@ -102,49 +108,3 @@ export const destroy = async (request, response) => {
     });
   }
 };
-
-// Old Functions:
-/* import { body } from "express-validator"
-import prisma from "../../utils/prisma.js"
-
-export const index = async (request, response) => {
-    try {
-        const courses = await prisma.courses.findMany({
-            include:{
-                type:true,
-                chapters:true,
-            },
-        })
-        return response.status(200).json({
-            courses:courses,
-        })
-    } catch (error) {
-        return response.status(500).json({
-            message:`Internal server error: ${error}`,
-        })
-        
-    }
-}
-
-export const show = async (request,response) => {
-    const {id} = request.params
-    try {
-        const course = await prisma.courses.findUnique({
-            where:{
-                id:parseInt(id),
-            }
-        })
-        if (!course) {
-            return response.status(401).json({
-                message:"Course not Found!",
-            })
-        }
-        return response.status(200).json({
-            course:course,
-        })
-    } catch (error) {
-        return response.status(500).json({
-            message:`Internal server error: ${error}`,
-        })
-    }
-} */

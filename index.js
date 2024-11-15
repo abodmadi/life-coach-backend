@@ -4,6 +4,7 @@ import courseRouter from "./routes/courseRouter.js";
 import userRouter from "./routes/userRouter.js";
 import paymentRouter from "./routes/paymentRouter.js";
 import enrollmentRouter from "./routes/enrollmentRouter.js";
+import chapterRouter from "./routes/chapterRouter.js";
 dotenv.config();
 
 const app = express();
@@ -22,6 +23,7 @@ app.use("/api/user", userRouter);
 app.use("/api/enrollment", enrollmentRouter);
 app.use("/api/payment", paymentRouter);
 app.use("/api/course", courseRouter);
+app.use("/api/chapter", chapterRouter);
 
 app.use("/api/test", (req, res) => {
   return res.send("Hello....");
