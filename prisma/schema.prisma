@@ -57,7 +57,7 @@ model Gaol {
 
 model Enrollment {
   id             String   @id @default(uuid())
-  enrollmentDate DateTime 
+  enrollmentDate DateTime
 
   studentId String
   courseId  String
@@ -83,7 +83,7 @@ model Course {
 
   chapters    Chapter[]
   enrollments Enrollment[]
-  payments Payment[]
+  payments    Payment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -112,18 +112,32 @@ model Chapter {
   name        String
   description String @db.MediumText
   coverImage  String
-  videoUrl    String
 
   courseId String
   course   Course @relation(fields: [courseId], references: [id], onUpdate: Cascade, onDelete: Cascade)
 
   assignments Assignment[]
   progress    Progress[]
+  videos      ChapterVideo[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("chapters")
+}
+
+model ChapterVideo {
+  id String @id @default(uuid())
+
+  chapterId String
+  videoUrl  String @db.MediumText
+
+  chapter Chapter @relation(fields: [chapterId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("chaptersVideos")
 }
 
 model Submission {
@@ -148,8 +162,8 @@ model Assignment {
   attachments String?
   status      String  @default("hidden")
 
-  startDate DateTime 
-  endDate   DateTime 
+  startDate DateTime
+  endDate   DateTime
 
   adminId   String
   studentId String
@@ -170,13 +184,13 @@ model Assignment {
 model Payment {
   id             String        @id @default(uuid())
   paymentReceipt String
-  paymentDate    DateTime      
+  paymentDate    DateTime
   status         PaymentStatus @default(Requested)
 
   studentId String
-  courseId String
+  courseId  String
   student   User   @relation(fields: [studentId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  course   Course   @relation(fields: [courseId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  course    Course @relation(fields: [courseId], references: [id], onUpdate: Cascade, onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

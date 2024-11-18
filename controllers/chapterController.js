@@ -1,36 +1,37 @@
 import prismaClient from "../utils/prismaClient.js";
 
 export const index = async (request, response) => {
-  const chapters = await prismaClient.chapter.findMany({
-    include: {
-      /* _count: {
+  try {
+    const chapters = await prismaClient.chapter.findMany({
+      include: {
+        _count: {
           select: {
-            chapters: true,
+            videos: true,
           },
-        }, */
-      course: {
-        select: {
-          id: true,
-          name: true,
-          admin: {
-            select: {
-              id: true,
-              firstName: true,
-              lastName: true,
+        },
+        course: {
+          select: {
+            id: true,
+            name: true,
+            admin: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+              },
             },
           },
         },
+        videos: true,
       },
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
 
-  return response.status(200).json({
-    chapters: chapters,
-  });
-  try {
+    return response.status(200).json({
+      chapters: chapters,
+    });
   } catch (error) {
     return response.status(406).json({
       error: error,
@@ -41,8 +42,16 @@ export const index = async (request, response) => {
 export const store = async (request, response) => {
   try {
     return response.status(200).json({
-      courses: await prismaClient.course.create({
-        data: request.body,
+      newChapter: await prismaClient.chapter.create({
+        data: {
+          name: request.body.name,
+          description: request.body.description,
+          coverImage: request.body.coverImage,
+          courseId: request.body.courseId,
+          videos: {
+            create: request.body.videos,
+          },
+        },
       }),
     });
   } catch (error) {
@@ -54,13 +63,13 @@ export const store = async (request, response) => {
 
 export const show = async (request, response) => {
   try {
-    const course = await prismaClient.course.findUnique({
+    const chapter = await prismaClient.chapter.findUnique({
       where: {
         id: request.params.uuid,
       },
     });
     return response.status(200).json({
-      course: course,
+      chapter: chapter,
     });
   } catch (error) {
     return response.status(406).json({
@@ -96,7 +105,7 @@ export const edit = async (request, response) => {
 export const destroy = async (request, response) => {
   try {
     return response.status(200).json({
-      delete: await prismaClient.course.delete({
+      delete: await prismaClient.chapter.delete({
         where: {
           id: request.params.uuid,
         },
