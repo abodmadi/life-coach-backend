@@ -1,5 +1,5 @@
 import { body, param } from "express-validator";
-
+// todo: video list validation and check it all validations [].
 export const paramUuIdValidator = (uuid, message, isOptional = false) =>
   param(uuid)
     .optional({ nullable: isOptional, checkFalsy: isOptional })

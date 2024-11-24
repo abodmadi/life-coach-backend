@@ -14,6 +14,8 @@ import {
   textValidator,
   urlValidator,
 } from "../utils/validationSchema.js";
+import { authenticateToken,authenticateRole } from "../middlewares/authenticationMiddleware.js";
+
 const chapterRouter = express.Router();
 
 const putDataValidations = [
@@ -24,6 +26,8 @@ const putDataValidations = [
     "Must enter a description to the chapter!"
   ),
   urlValidator("coverImage", "Must enter a cover image to the chapter!"),
+  //urlValidator("videosUrls", "Must enter a cover image to new chapter!"),
+  bodyUuIdValidator("courseId", "Must select a course to add chapter to it!"),
 ];
 
 const storeDataValidations = [
@@ -37,7 +41,7 @@ const storeDataValidations = [
   bodyUuIdValidator("courseId", "Must select a course to add chapter to it!"),
 ];
 
-chapterRouter.get("/all", index);
+chapterRouter.get("/all",authenticateToken,authenticateRole(["ADMIN"]) ,index);
 
 chapterRouter.post("/store", storeDataValidations, validate, store);
 chapterRouter.get(

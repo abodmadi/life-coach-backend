@@ -13,6 +13,12 @@ import {
   textValidator,
   urlValidator,
 } from "../utils/validationSchema.js";
+
+import {
+  authenticateToken,
+  authenticateRole,
+} from "../middlewares/authenticationMiddleware.js";
+
 const courseRouter = express.Router();
 
 const putDataValidations = [
@@ -27,7 +33,12 @@ const putDataValidations = [
 
 const storeDataValidations = [];
 
-courseRouter.get("/all", index);
+courseRouter.get(
+  "/all",
+  authenticateToken,
+  authenticateRole(["ADMIN"]),
+  index
+);
 courseRouter.post("/store", storeDataValidations, validate, store);
 courseRouter.get(
   "/show/:uuid",

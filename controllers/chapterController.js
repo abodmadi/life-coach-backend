@@ -80,20 +80,25 @@ export const show = async (request, response) => {
 
 export const edit = async (request, response) => {
   try {
-    const { name, description, coverImage, price } = request.body;
-    const editedCorse = await prismaClient.course.update({
-      data: {
-        name: name,
-        coverImage: coverImage,
-        description: description,
-        price: price,
-      },
+    const { name, description, coverImage, courseId, videos } = request.body;
+    const editedChapter = await prismaClient.chapter.update({
       where: {
         id: request.params.uuid,
       },
+      data: {
+        name: name,
+        description: description,
+        coverImage: coverImage,
+        courseId: courseId,
+        videos: {
+          deleteMany: {},
+          create: videos.map((video) => ({ videoUrl: video.videoUrl })),
+        },
+      },
+      include: { videos: true },
     });
     return response.status(200).json({
-      editedCorse: editedCorse,
+      editedChapter: editedChapter,
     });
   } catch (error) {
     return response.status(406).json({

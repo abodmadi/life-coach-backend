@@ -1,4 +1,108 @@
-import prisma from "../../utils/prisma.js"
+import prismaClient from "../utils/prismaClient.js";
+import { generateToken } from "../utils/token.js";
+import bcrypt from "bcrypt";
+
+export const signIn = async (request, response) => {
+  try {
+    const user = await prismaClient.user.findUnique({
+      where: { email: request.body.email },
+    });
+
+    if (!user)
+      return response.status(404).json({
+        error: "User not found!",
+      });
+
+    const isPasswordMatched = bcrypt.compareSync(
+      request.body.password,
+      user.password
+    );
+
+    if (!isPasswordMatched)
+      return response.status(401).json({
+        error: "Wrong credentials!",
+      });
+
+    const userToken = generateToken(user);
+
+    await prismaClient.token.create({
+      data: {
+        userId: user.id,
+        token: userToken,
+      },
+    });
+
+    const { password: pass, ...authUser } = user;
+    return response
+      .cookie("access_token", userToken, {
+        httpOnly: true,
+        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      })
+      .status(200)
+      .json({
+        //token: userToken,
+        user: authUser,
+      });
+  } catch (error) {
+    return response.status(406).json({
+      error: error,
+    });
+  }
+};
+
+export const signUp = async (request, response) => {
+  try {
+    const existingUser = await prismaClient.user.findFirst({
+      where: {
+        OR: [
+          {
+            email: request.body.email,
+          },
+          {
+            phone: request.body.phone,
+          },
+        ],
+      },
+    });
+    if (existingUser)
+      return response.status(400).json({
+        error: "User is already exists!,email or phone number already exists",
+      });
+
+    request.body.password = bcrypt.hashSync(request.body.password, 10);
+
+    const user = await prismaClient.user.create({
+      data: request.body,
+    });
+    const { password: pass, ...newUser } = user;
+    return response.status(200).json({
+      newUser: newUser,
+    });
+  } catch (error) {
+    return response.status(406).json({
+      error: error,
+    });
+  }
+};
+export const google = async (request, response) => {};
+
+export const signOut = async (request, response) => {
+  try {
+    await prismaClient.token.deleteMany({
+      where: { userId: request.params.uuid },
+    });
+
+    return response.clearCookie("access_token").status(200).json({
+      message: "Logging out successfully",
+    });
+  } catch (error) {
+    return response.status(406).json({
+      error: error,
+    });
+  }
+};
+
+/* import prisma from "../../utils/prisma.js"
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
@@ -182,4 +286,4 @@ export const signOut = (request,response)=>{
     return response.status(200).json({
         message:"Auth API out"
     })
-}
+} */
