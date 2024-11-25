@@ -186,6 +186,7 @@ model Payment {
   paymentReceipt String
   paymentDate    DateTime
   status         PaymentStatus @default(Requested)
+  paymentMethod  PaymentMethods 
 
   studentId String
   courseId  String
@@ -228,4 +229,9 @@ enum PaymentStatus {
   Pending
   Accepted
   Rejected
+}
+
+enum PaymentMethods {
+  BankTransfer
+  ElectronicWallet
 }
