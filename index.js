@@ -6,6 +6,10 @@ import paymentRouter from "./routes/paymentRouter.js";
 import enrollmentRouter from "./routes/enrollmentRouter.js";
 import chapterRouter from "./routes/chapterRouter.js";
 import authRouter from "./routes/authRouter.js";
+import {
+  authenticateRole,
+  authenticateToken,
+} from "./middlewares/authenticationMiddleware.js";
 import cookieParser from "cookie-parser";
 dotenv.config();
 
@@ -24,7 +28,7 @@ app.listen(PORT, () => {
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 app.use("/api/enrollment", enrollmentRouter);
-app.use("/api/payment", paymentRouter);
+app.use("/api/payment", paymentRouter); //authenticateToken,authenticateRole(["ADMIN"]),
 app.use("/api/course", courseRouter);
 app.use("/api/chapter", chapterRouter);
 

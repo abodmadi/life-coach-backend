@@ -182,11 +182,11 @@ model Assignment {
 }
 
 model Payment {
-  id             String        @id @default(uuid())
+  id             String         @id @default(uuid())
   paymentReceipt String
   paymentDate    DateTime
-  status         PaymentStatus @default(Requested)
-  paymentMethod  PaymentMethods 
+  status         PaymentStatus  @default(Requested)
+  paymentMethod  PaymentMethods
 
   studentId String
   courseId  String

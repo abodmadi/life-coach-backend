@@ -35,8 +35,8 @@ const storeDataValidations = [];
 
 courseRouter.get(
   "/all",
-  authenticateToken,
-  authenticateRole(["ADMIN"]),
+  /* authenticateToken,
+  authenticateRole(["ADMIN"]), */
   index
 );
 courseRouter.post("/store", storeDataValidations, validate, store);
