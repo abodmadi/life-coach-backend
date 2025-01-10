@@ -1,7 +1,7 @@
 import express from "express";
-import { index, store } from "../controllers/paymentController.js";
+import { index, store, userPayment } from "../controllers/paymentController.js";
 import { validate } from "../middlewares/validationMiddleware.js";
-import { bodyUuIdValidator, dateValidator,isInListValidator,urlValidator } from "../utils/validationSchema.js";
+import { bodyUuIdValidator, dateValidator,isInListValidator,paramUuIdValidator,urlValidator } from "../utils/validationSchema.js";
 
 const storeDataValidation = [
   dateValidator("paymentDate","Invalid date format. Use YYYY-MM-DD"),
@@ -17,9 +17,14 @@ const storeDataValidation = [
     "Payment receipt must be attached to this transaction!",
   ),
 ];
+const userPaymentValidation=[
+  paramUuIdValidator("uuid", "You must specify student!")
+];
+
 const paymentRouter = express.Router();
 
 paymentRouter.get("/all", index);
 paymentRouter.post("/store", storeDataValidation, validate, store);
+paymentRouter.get("/user-payment/:uuid", userPaymentValidation, validate, userPayment);
 
 export default paymentRouter;

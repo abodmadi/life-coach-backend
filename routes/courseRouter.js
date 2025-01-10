@@ -43,6 +43,8 @@ courseRouter.post("/store", storeDataValidations, validate, store);
 courseRouter.get(
   "/show/:uuid",
   paramUuIdValidator("uuid", "Must select a course to show it."),
+  authenticateToken,
+  authenticateRole(["ADMIN","STUDENT"]),
   validate,
   show
 );
@@ -50,6 +52,8 @@ courseRouter.put("/update/:uuid", putDataValidations, validate, edit);
 courseRouter.delete(
   "/delete/:uuid",
   paramUuIdValidator("uuid", "Must select a course to delete it."),
+  authenticateToken,
+  authenticateRole(["ADMIN"]),
   validate,
   destroy
 );

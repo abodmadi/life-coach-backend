@@ -28,7 +28,7 @@ app.listen(PORT, () => {
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 app.use("/api/enrollment", enrollmentRouter);
-app.use("/api/payment", paymentRouter); //authenticateToken,authenticateRole(["ADMIN"]),
+app.use("/api/payment", paymentRouter); //authenticateToken,authenticateRole(["ADMIN","STUDENT"]),
 app.use("/api/course", courseRouter);
 app.use("/api/chapter", chapterRouter);
 
@@ -46,3 +46,11 @@ app.use("/api/test", (req, res) => {
         message,
     });
 }); */
+
+/*
+// Hosting Account //
+user: ab18e2_coach
+pas:dedoted652
+server:mysql1001.site4now.net
+email:dedoted652@pariag.com
+*/
