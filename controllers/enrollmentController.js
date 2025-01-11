@@ -1,15 +1,15 @@
 import prismaClient from "../utils/prismaClient.js";
 export const userEnrollment = async (request, response) => {
-  try {
+  
     return response.status(200).json({
       enrollments: await prismaClient.enrollment.findMany({
         where: {
           studentId: request.params.uuid,
         },
-        select:{
+        select: {
           id: true,
           enrollmentDate: true,
-          createdAt:true,
+          createdAt: true,
           updatedAt: true,
           course: {
             select: {
@@ -18,11 +18,16 @@ export const userEnrollment = async (request, response) => {
               description: true,
               coverImage: true,
               price: true,
+              _count:{
+                select: {
+                  chapters: true,
+                },
+              }
             },
           },
         },
       }),
-    });
+    });try {
   } catch (error) {
     return response.status(406).json({
       error: error,
