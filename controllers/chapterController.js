@@ -61,6 +61,36 @@ export const store = async (request, response) => {
   }
 };
 
+export const courseChapters = async (request, response) => {
+  try {
+    const courseChapters = await prismaClient.chapter.findMany({
+      where: {
+        courseId: request.params.uuid,
+      },
+      include: {
+        _count: {
+          select: {
+            videos: true,
+          },
+        },
+        course: {
+          select: {
+            name: true,
+          },
+        },
+        videos: true,
+      },
+    });
+    return response.status(200).json({
+      courseChapters: courseChapters,
+    });
+  } catch (error) {
+    return response.status(406).json({
+      error: error,
+    });
+  }
+};
+
 export const show = async (request, response) => {
   try {
     const chapter = await prismaClient.chapter.findUnique({

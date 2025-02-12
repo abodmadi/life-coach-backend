@@ -1,6 +1,6 @@
 import prismaClient from "../utils/prismaClient.js";
 export const userEnrollment = async (request, response) => {
-  
+  try {
     return response.status(200).json({
       enrollments: await prismaClient.enrollment.findMany({
         where: {
@@ -27,7 +27,7 @@ export const userEnrollment = async (request, response) => {
           },
         },
       }),
-    });try {
+    });
   } catch (error) {
     return response.status(406).json({
       error: error,
@@ -40,8 +40,8 @@ export const store = async (request, response) => {
       newEnrollment: await prismaClient.enrollment.create({
         data: {
           enrollmentDate: new Date(),
-          studentId: "28fc5776-89b8-40df-93b8-1689cf7baf60",
-          courseId: "913645cd-88a2-433e-9fcb-73a80061e5e7",
+          studentId: "00c8d7a8-6e6f-4141-bdc8-a0c1c443bd6c",
+          courseId: "23f81dec-9607-44cc-bda6-15334723ebc1",
         },
       }),
     });

@@ -5,6 +5,7 @@ import {
   destroy,
   edit,
   show,
+  courseChapters,
 } from "../controllers/chapterController.js";
 import { validate } from "../middlewares/validationMiddleware.js";
 import {
@@ -44,6 +45,7 @@ const storeDataValidations = [
 chapterRouter.get("/all",authenticateToken,authenticateRole(["ADMIN"]) ,index);
 
 chapterRouter.post("/store", storeDataValidations, validate, store);
+chapterRouter.get("/course-chapters/:uuid",courseChapters );
 chapterRouter.get(
   "/show/:uuid",
   paramUuIdValidator("uuid", "Must select a chapter to show it!"),
